@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Basic Agent — Chat</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 760px;
+      height: 90vh;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      overflow: hidden;
+    }
+
+    header {
+      background: #0078d4;
+      color: #fff;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 { font-size: 1.1rem; font-weight: 600; }
+
+    #new-chat-btn {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    #new-chat-btn:hover { background: rgba(255,255,255,0.35); }
+
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .message {
+      max-width: 75%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      line-height: 1.5;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: #0078d4;
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.agent {
+      align-self: flex-start;
+      background: #f0f2f5;
+      color: #1a1a1a;
+      border-bottom-left-radius: 4px;
+    }
+
+    .message.thinking {
+      align-self: flex-start;
+      background: #f0f2f5;
+      color: #888;
+      font-style: italic;
+      border-bottom-left-radius: 4px;
+    }
+
+    .message.error {
+      align-self: flex-start;
+      background: #fce8e8;
+      color: #b00;
+      border-bottom-left-radius: 4px;
+    }
+
+    footer {
+      padding: 16px 24px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      gap: 10px;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 10px 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+      resize: none;
+      font-family: inherit;
+      line-height: 1.4;
+    }
+    #user-input:focus { border-color: #0078d4; box-shadow: 0 0 0 2px rgba(0,120,212,0.15); }
+
+    #send-btn {
+      background: #0078d4;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    #send-btn:hover { background: #006cbe; }
+    #send-btn:disabled { background: #a0c4e8; cursor: not-allowed; }
+
+    .session-badge {
+      font-size: 0.7rem;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #9ca3af;
+      margin: auto;
+    }
+    .empty-state p { margin-top: 8px; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <header>
+      <h1>🤖 Basic Agent</h1>
+      <button id="new-chat-btn" title="Start a new conversation">New chat</button>
+    </header>
+
+    <div id="messages">
+      <div class="empty-state">
+        <strong>Start a conversation</strong>
+        <p>Type a message below and press Send or Enter.</p>
+      </div>
+    </div>
+
+    <footer>
+      <textarea id="user-input" rows="1" placeholder="Type a message…"></textarea>
+      <button id="send-btn">Send</button>
+    </footer>
+  </div>
+
+  <script>
+    const messagesEl = document.getElementById('messages');
+    const inputEl    = document.getElementById('user-input');
+    const sendBtn    = document.getElementById('send-btn');
+    const newChatBtn = document.getElementById('new-chat-btn');
+
+    let sessionId = null;
+
+    function clearChat() {
+      sessionId = null;
+      messagesEl.innerHTML = `
+        <div class="empty-state">
+          <strong>Start a conversation</strong>
+          <p>Type a message below and press Send or Enter.</p>
+        </div>`;
+    }
+
+    function appendMessage(role, text) {
+      // Remove empty-state if present
+      const empty = messagesEl.querySelector('.empty-state');
+      if (empty) empty.remove();
+
+      const div = document.createElement('div');
+      div.className = `message ${role}`;
+      div.textContent = text;
+      messagesEl.appendChild(div);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      return div;
+    }
+
+    async function sendMessage() {
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      inputEl.value = '';
+      inputEl.style.height = 'auto';
+      sendBtn.disabled = true;
+
+      appendMessage('user', text);
+      const thinking = appendMessage('thinking', 'Thinking…');
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, sessionId })
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: res.statusText }));
+          thinking.className = 'message error';
+          thinking.textContent = `Error: ${err.error ?? res.statusText}`;
+          return;
+        }
+
+        const data = await res.json();
+        sessionId = data.sessionId;
+        thinking.className = 'message agent';
+        thinking.textContent = data.reply;
+      } catch (e) {
+        thinking.className = 'message error';
+        thinking.textContent = `Network error: ${e.message}`;
+      } finally {
+        sendBtn.disabled = false;
+        inputEl.focus();
+      }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    newChatBtn.addEventListener('click', clearChat);
+
+    // Send on Enter (Shift+Enter for newline)
+    inputEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Auto-resize textarea
+    inputEl.addEventListener('input', () => {
+      inputEl.style.height = 'auto';
+      inputEl.style.height = Math.min(inputEl.scrollHeight, 160) + 'px';
+    });
+  </script>
+</body>
+</html>

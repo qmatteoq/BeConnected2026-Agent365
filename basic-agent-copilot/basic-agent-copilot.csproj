@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AdaptiveCards" Version="3.1.0" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="2.9.0-beta.1" />
+    <PackageReference Include="Azure.Identity" Version="1.21.0" />
+    <!-- A365 Observability — OBO / agentic-identity path (mirrors the BAF sample).
+         AddAgenticTracingExporter() registers IExporterTokenCache<AgenticTokenStruct>;
+         AddA365Tracing() wires the Agent365Exporter to read per-(agent, tenant) tokens
+         from that cache. The agent calls _agentTokenCache.RegisterObservability(...)
+         per turn with the user's OBO-exchanged agentic token. This is the supported
+         path for Copilot/Teams-hosted M365 Agents SDK agents (the S2S/AI Teammate
+         path applies only to autonomous, non-user-initiated workloads). -->
+    <PackageReference Include="Microsoft.Agents.A365.Observability.Hosting" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Agents.A365.Observability.Runtime" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Bcl.Memory" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Agents.AI.OpenAI" Version="1.4.0" />
+    <PackageReference Include="Microsoft.Agents.Authentication.Msal" Version="1.*" />
+    <PackageReference Include="Microsoft.Agents.Hosting.AspNetCore" Version="1.*" />
+  </ItemGroup>
+
+  <!-- Exclude local settings from publish -->
+  <ItemGroup>
+    <None Include="appsettings.json" />
+  </ItemGroup>
+</Project>

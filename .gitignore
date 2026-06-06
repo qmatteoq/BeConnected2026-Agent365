@@ -1,0 +1,107 @@
+# ==========================================================================
+# .gitignore for the BeConnected 2026 — Agent 365 samples
+# Covers both projects:
+#   - basic-agent-copilot  (.NET / C# — M365 Agents SDK)
+#   - basic-agent-python   (Python — LangChain + LangGraph + FastAPI)
+# ==========================================================================
+
+# --------------------------------------------------------------------------
+# Secrets & local environment
+# --------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.local.json
+appsettings.*.local.json
+
+# appsettings.json contains tenant secrets (ClientSecret, IDs) — keep it local.
+# A sanitized appsettings.sample.json is committed instead as a template.
+appsettings.json
+**/appsettings.json
+!appsettings.sample.json
+!**/appsettings.sample.json
+
+# Agent 365 config (tenant-specific; users must run the Agent 365 CLI on their
+# own tenant to register the agent and generate these files)
+a365.config.json
+**/a365.config.json
+a365.generated.config.json
+**/a365.generated.config.json
+
+# --------------------------------------------------------------------------
+# .NET / C# (basic-agent-copilot)
+# --------------------------------------------------------------------------
+bin/
+obj/
+out/
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+x64/
+x86/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.cache
+*.dll
+*.pdb
+*.exe
+project.lock.json
+project.assets.json
+*.nuget.props
+*.nuget.targets
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.csproj.user
+
+# --------------------------------------------------------------------------
+# Python (basic-agent-python)
+# --------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+develop-eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# Test / coverage / type-checker caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# --------------------------------------------------------------------------
+# Editors & OS
+# --------------------------------------------------------------------------
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# --------------------------------------------------------------------------
+# Logs & temp
+# --------------------------------------------------------------------------
+*.log
+logs/
+tmp/
+temp/

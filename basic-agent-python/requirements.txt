@@ -1,0 +1,16 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+python-dotenv>=1.0.1
+azure-identity>=1.19.0
+langchain>=0.3.7
+langchain-openai>=0.2.8
+langgraph>=0.2.50
+langchain-mcp-adapters>=0.1.0
+mcp>=1.0.0
+microsoft-opentelemetry
+# Required for the custom OTLP exporter. The microsoft-opentelemetry Python
+# distro auto-wires OTLP via opentelemetry-exporter-otlp-proto-http when
+# OTEL_EXPORTER_OTLP_ENDPOINT is set (HTTP/protobuf only — gRPC is ignored).
+opentelemetry-exporter-otlp-proto-http
+msal
+httpx

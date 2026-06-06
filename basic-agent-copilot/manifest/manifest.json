@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/vdevPreview/MicrosoftTeams.schema.json",
+  "id": "009032dc-b728-4901-8e2f-ae8b266b202e",
+  "name": {
+    "short": "zava-weather-AI",
+    "full": "zava-weather-ai"
+  },
+  "description": {
+    "short": "zava-weather-ai",
+    "full": "zava-weather-ai"
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#0078D4",
+  "version": "1.0.0",
+  "manifestVersion": "devPreview",
+  "developer": {
+    "name": "Matteo Pagani",
+    "mpnId": "",
+    "websiteUrl": "https://www.developerscantina.com",
+    "privacyUrl": "https://www.developerscantina.com/privacy",
+    "termsOfUseUrl": "https://www.developerscantina.com/termsofuse"
+  },
+  "agenticUserTemplates": [
+    {
+      "id": "7b0926a6-c4ee-445a-a913-bd054594bd09",
+      "file": "agenticUserTemplateManifest.json"
+    }
+  ]
+}
